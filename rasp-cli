@@ -1,0 +1,31 @@
+#!/usr/bin/env python
+
+from __future__ import unicode_literals
+from future.standard_library import install_aliases
+install_aliases()
+import argparse
+from os import geteuid
+
+from rasp.common.config import __VERSION__
+from rasp.common.config import APPLICATION_NAME
+from rasp.core.runtime import check_permission
+from dashboard.core.webapp import web_app_start
+
+
+def main():
+    argparser = argparse.ArgumentParser(prog=APPLICATION_NAME, description="RASP for PHP")
+    argparser.add_argument('-v', '--version', action='version', version='%(prog)s {}'.format(__VERSION__))
+    argparser.add_argument('-P', '--port', default=9999, help="dashboard Port (eg: 9999)")
+    argparser.add_argument('-H', '--host', default="127.0.0.1", help="dashboard Host (eg: 127.0.0.1)")
+    argparser.add_argument('--debug', action='store_true', help="Debug Mode")
+
+    args = argparser.parse_args()
+    
+    if not args.debug and not check_permission(geteuid()):
+        print("[ERROR] Sorry, you need root permissions/SUDO to run this app.")
+        exit(-1)
+    
+    web_app_start(args.host, args.port)
+
+if __name__ == '__main__':
+    main()
