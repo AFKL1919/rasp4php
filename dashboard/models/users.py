@@ -1,7 +1,8 @@
 from dashboard.core.db import DB_BASE
 
+import json
 from hashlib import sha1
-from sqlalchemy import Column, Integer, String, DATETIME
+from sqlalchemy import Column, Integer, String
 
 
 class Users(DB_BASE.Model):
@@ -17,7 +18,16 @@ class Users(DB_BASE.Model):
     def __init__(self, username: str, password: str, permission: int = 1):
         self.permission = permission
         self.username = username
-        self.password = self.user_password_hash(password)
+        self.password = Users.hash_user_password(password)
     
-    def user_password_hash(password: str):
+    @staticmethod
+    def hash_user_password(password: str) -> str:
         return sha1(password.encode()).hexdigest()
+    
+    def serialize(self) -> dict:
+        return {
+            'id': self.id,
+            'username': self.username,
+            'password': self.password,
+            'permission': self.permission
+        }
