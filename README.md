@@ -1,36 +1,18 @@
-# RASP4PHP   ![license](https://img.shields.io/github/license/idaifish/rasp4php.svg) [![Build Status](https://travis-ci.com/idaifish/rasp4php.svg?branch=master)](https://travis-ci.com/idaifish/rasp4php)
+# RASP4PHP
 
-Runtime Application Self-Protection for PHP, based on [Frida](https://www.frida.re), mostly used as a sensor for SIEM.
+原项目 [idaifish/rasp4php](https://github.com/idaifish/rasp4php)
+
+适用于 `PHP7.0` 的 运行时自我保护程序（RASP），基于 [Frida](https://www.frida.re) 以及开源项目 [idaifish/rasp4php](https://github.com/idaifish/rasp4php)。
 
 
-## Compatibility
-
-Tested on Ubuntu 1604, PHP 5.x and 7.x are officially supported.
-
+## 适用版本
+- 系统：Ubuntu 1604
+- PHP版本：php-fpm 7.0
 
 ## Usage
-
-**VM**
-
-```bash
-# pip install pipenv
-$ pipenv install
-$ pipenv shell
-
-# Console
-$ sudo pipenv run rasp-debug
-
-# GELF UDP Output
-$ sudo pipenv run rasp --graylog 127.0.0.1 --graylog-port 27017
-
-# Webhook
-$ sudo pipenv run rasp --webhook http://127.0.0.1:8080/webhooks
-```
 
 **Docker**
 
 ```bash
-$ export RASP4PHP7_OPTION="--webhook http://127.0.0.1:8080/webhooks"
-$ export RASP4PHP5_OPTION="--graylog 127.0.0.1 --graylog-port 27017"
-$ docker-compose up
+docker-compose up
 ```
