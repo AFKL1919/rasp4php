@@ -2,7 +2,6 @@
     "APP_CONFIG":{
         /* If it is empty, a random value will be generated. */
         "SECRET_KEY": "",
-        "DEFAULT_USERNAME": "rasp_admin",
         /* Unit minutes */
         "PERMANENT_SESSION_LIFETIME": 5
     },
