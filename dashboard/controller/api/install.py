@@ -1,9 +1,11 @@
 from dashboard.core.webapp import WEBAPP
-from dashboard.utils.web import json_data
 from rasp.core.app import RASP_APP
+from dashboard.utils.web import json_data, not_install_required, admin_required
 
 
 @WEBAPP.route("/api/install", methods=["GET"])
+@not_install_required
+@admin_required
 def start_install():
     
     if not RASP_APP.is_installed:
