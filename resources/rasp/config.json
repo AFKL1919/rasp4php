@@ -1,5 +1,6 @@
 {
-    "PATH": {
-        "RASP_APP_ROOT": ""
+    "RASP_CONFIG": {
+        "VERSION": "0.6.1",
+        "APPLICATION_NAME": "RASP4PHP"
     }
 }
