@@ -23,7 +23,4 @@ def get_alarm_log():
 
         msg_dict_list.append(msg_obj_dict)
         
-    return json_data({
-        "status": 200,
-        "data": msg_dict_list
-    })
+    return json_data(msg_dict_list)

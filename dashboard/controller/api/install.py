@@ -15,16 +15,12 @@ def start_install():
             RASP_APP.is_installed = False
             WEBAPP.logger.exception(e)
             return json_data({
-                "status": 500,
-                "data": {
-                    "msg": "{}".format(e),
-                    "is_installed": RASP_APP.is_installed
-                }
-            })
+                "msg": "{}".format(e),
+                "is_installed": RASP_APP.is_installed
+                },
+                500
+            )
     
     return json_data({
-        "status": 200,
-        "data": {
-            "is_installed": RASP_APP.is_installed
-        }
+        "is_installed": RASP_APP.is_installed
     })
