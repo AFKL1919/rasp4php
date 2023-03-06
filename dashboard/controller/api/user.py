@@ -22,9 +22,9 @@ def update_info():
         return json_data("输入格式错误", 400)
 
     if user.id == None:
-        return json_data("用户添加失败", 500)
+        return json_data("用户信息修改失败", 500)
 
-    return json_data("用户添加成功", 200)
+    return json_data("用户信息修改成功", 200)
 
 @WEBAPP.route("/api/user/admin_register", methods=["POST"])
 @not_install_required
