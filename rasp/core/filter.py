@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 import inspect
 from enum import Enum
+from typing import List
 from collections import defaultdict
 from abc import ABCMeta, abstractmethod
 
@@ -8,8 +9,8 @@ from future.utils import with_metaclass
 
 from rasp.utils.log import logger
 
-from rasp.core.rule import RuleManager
-from rasp.common.config import PROJECT_ROOT
+from rasp.core.rule import RULE_MANAGER, AbstractRule
+from rasp.common.config import PROJECT_ROOT, Path
 
 
 class FilterResult(Enum):
@@ -36,13 +37,21 @@ class FilterContext(Enum):
 class AbstractFilter(with_metaclass(ABCMeta)):
     """Base class for creating a filter."""
 
+    rule = defaultdict(list)
     name = 'AbstractFilter'
     context = FilterContext.ANY
-    rule_entries = ()            # Section name in the rule file
+    rule_method = AbstractRule
 
-    def __init__(self, rule=None):
-        self.rule = rule
+    def __init__(self):
         logger.info("Filter '{}' is loaded.".format(self.name))
+    
+    def update_filter_rule(self):
+        rule_list = RULE_MANAGER.get_rule_list(self.name)
+        self.init_filter_rule(rule_list)
+    
+    @abstractmethod
+    def init_filter_rule(self, rule_list: List[AbstractRule]):
+        pass
 
     @abstractmethod
     def filter(self, message):
@@ -52,49 +61,71 @@ class AbstractFilter(with_metaclass(ABCMeta)):
 class FilterManager(object):
     """Managing filters."""
 
+    filters_context_dict = defaultdict(list)
+    filters_name_dict = defaultdict(AbstractFilter)
     DEFAULT_FILTER_DIR = PROJECT_ROOT / 'rasp/filters'
 
     def __init__(self, filter_path=None):
-        self.rule_manager = RuleManager()
-        self.filters = defaultdict(list)
         self.load_filters(filter_path)
 
+    def get_filter_define_files(self, filter_paths: List[Path]):
+        for filter_path in filter_paths:
+            files = [filter_file for filter_file in filter_path.resolve().rglob('*.py')]
+            yield from files
+
+    def load_module_from_file(self, filter_file: Path):
+        try:
+            # Python3
+            import importlib.util
+            spec = importlib.util.spec_from_file_location(filter_file.stem, filter_file.as_posix())
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+        except ImportError:
+            # Python2
+            import imp
+            module = imp.load_source(filter_file.stem, filter_file.as_posix())
+        
+        return module
+
+    def is_filter(self, obj):
+        return inspect.isclass(obj) and issubclass(obj, AbstractFilter) and obj is not AbstractFilter
+    
+    def init_filter(self, filter_class: AbstractFilter) -> AbstractFilter:
+        return filter_class()
+
+    def load_filter_from_module(self, module):
+        for _, member_obj in inspect.getmembers(module):
+
+            if not self.is_filter(member_obj):
+                continue
+
+            filter_instance = self.init_filter(member_obj)
+            self.import_filters_dict(filter_instance)
+
+    def import_filters_dict(self, filter_instance: AbstractFilter):
+        self.filters_name_dict[filter_instance.name] = filter_instance
+        self.filters_context_dict[filter_instance.context].append(filter_instance)
+
     def load_filters(self, path=None):
+        modules = list()
         filter_paths = [self.DEFAULT_FILTER_DIR, ]
+
         if path is not None:
             filter_paths.append(path)
 
-        for filter_path in filter_paths:
-            for filter_file in filter_path.resolve().rglob('*.py'):
-                try:
-                    # Python3
-                    import importlib.util
-                    spec = importlib.util.spec_from_file_location(filter_file.stem, filter_file.as_posix())
-                    module = importlib.util.module_from_spec(spec)
-                    spec.loader.exec_module(module)
-                except ImportError:
-                    # Python2
-                    import imp
-                    module = imp.load_source(filter_file.stem, filter_file.as_posix())
+        for filter_file in self.get_filter_define_files(filter_paths):
+            modules.append(self.load_module_from_file(filter_file))
 
-                for member_name, member_obj in inspect.getmembers(module):
-                    if inspect.isclass(member_obj) \
-                            and issubclass(member_obj, AbstractFilter) \
-                            and member_obj is not AbstractFilter:
-                        filter_class = member_obj
-                        filter_instance = self.init_filter(filter_class)
-                        self.filters[filter_instance.context].append(filter_instance)
+        for module in modules:
+            self.load_filter_from_module(module)
+        
+    def update_filter(self, filename: str) -> bool:
+        module = self.load_module_from_file(Path(filename))
+        self.load_filter_from_module(module)
 
     def get_filters(self, context):
-        return self.filters[FilterContext.ANY] + self.filters[context]
-
-    def init_filter(self, filter_class):
-        rule = {}
-        for entry in filter_class.rule_entries:
-            rule[entry] = self.rule_manager.get_rule(entry)
-
-        return filter_class(rule)
-
+        return self.filters_context_dict[FilterContext.ANY] + self.filters_context_dict[context]
+    
     def filter(self, message):
         try:
             filters = self.get_filters(FilterContext(message['context']))
@@ -104,3 +135,5 @@ class FilterManager(object):
             return FilterResult.DEFAULT.value
 
         return all(result)
+
+FILTER_MANAGER = FilterManager()
