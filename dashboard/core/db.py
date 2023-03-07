@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from rasp.utils.log import logger
 from dashboard.core.webapp import WEBAPP
 
-DB_BASE = SQLAlchemy(WEBAPP)
+DB_BASE = SQLAlchemy(WEBAPP, session_options={"expire_on_commit": False})
 DB_SESSION = DB_BASE.session
 DB_BASE.init_app(WEBAPP)
 
