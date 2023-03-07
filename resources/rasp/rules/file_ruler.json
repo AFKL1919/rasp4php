@@ -1,0 +1,132 @@
+[
+    {
+        "data": ".git",
+        "id": 1,
+        "rule_type": 1
+    },
+    {
+        "data": ".svn",
+        "id": 2,
+        "rule_type": 1
+    },
+    {
+        "data": ".htaccess",
+        "id": 3,
+        "rule_type": 1
+    },
+    {
+        "data": ".htdigest",
+        "id": 4,
+        "rule_type": 1
+    },
+    {
+        "data": ".htpasswd",
+        "id": 5,
+        "rule_type": 1
+    },
+    {
+        "data": ".bashrc",
+        "id": 6,
+        "rule_type": 1
+    },
+    {
+        "data": ".zshrc",
+        "id": 7,
+        "rule_type": 1
+    },
+    {
+        "data": ".zsh_history",
+        "id": 8,
+        "rule_type": 1
+    },
+    {
+        "data": ".bash_histroy",
+        "id": 9,
+        "rule_type": 1
+    },
+    {
+        "data": ".bash_profile",
+        "id": 10,
+        "rule_type": 1
+    },
+    {
+        "data": ".python_history",
+        "id": 11,
+        "rule_type": 1
+    },
+    {
+        "data": ".mysql_history",
+        "id": 12,
+        "rule_type": 1
+    },
+    {
+        "data": ".rediscli_history",
+        "id": 13,
+        "rule_type": 1
+    },
+    {
+        "data": "id_ras",
+        "id": 14,
+        "rule_type": 1
+    },
+    {
+        "data": "id_ras.pub",
+        "id": 15,
+        "rule_type": 1
+    },
+    {
+        "data": "known_hosts",
+        "id": 16,
+        "rule_type": 1
+    },
+    {
+        "data": "authorized_keys",
+        "id": 17,
+        "rule_type": 1
+    },
+    {
+        "data": "nohup.out",
+        "id": 18,
+        "rule_type": 1
+    },
+    {
+        "data": "/etc/passwd",
+        "id": 19,
+        "rule_type": 1
+    },
+    {
+        "data": "/etc/shadow",
+        "id": 20,
+        "rule_type": 1
+    },
+    {
+        "data": "/etc/hosts",
+        "id": 21,
+        "rule_type": 1
+    },
+    {
+        "data": "/var/log/nginx",
+        "id": 22,
+        "rule_type": 1
+    },
+    {
+        "data": "/var/log/apache2",
+        "id": 23,
+        "rule_type": 1
+    },
+    {
+        "data": "/proc",
+        "id": 24,
+        "rule_type": 1
+    },
+    {
+        "data": "/sys",
+        "id": 25,
+        "rule_type": 1
+    },
+    {
+        "data": "/home",
+        "id": 26,
+        "rule_type": 1
+    }
+]

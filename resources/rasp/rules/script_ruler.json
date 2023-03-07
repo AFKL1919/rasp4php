@@ -1,0 +1,7 @@
+[
+    {
+        "id": 1,
+        "data": "/path/to/ignore_eval.php:233",
+        "rule_type": 1
+    }
+]

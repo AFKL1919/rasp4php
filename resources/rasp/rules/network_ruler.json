@@ -1,0 +1,14 @@
+[
+    {
+        "id": 1,
+        "data": "api.wordpress.com",
+        "rule_type": 2,
+        "data_type": "domain"
+    },
+    {
+        "id": 2,
+        "data": "127.0.0.1",
+        "rule_type": 1,
+        "data_type": "ip"
+    }
+]
