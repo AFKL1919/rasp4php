@@ -37,8 +37,11 @@ def register_admin():
     else:
         return json_data("输入格式错误", 400)
     
-    DB_SESSION.add(user)
-    DB_SESSION.commit()
+    if user != None:
+        DB_SESSION.add(user)
+        DB_SESSION.commit()
+    else:
+        return json_data("用户添加失败，请更换用户名！", 400)
 
     if user.id == None:
         return json_data("用户添加失败", 500)
@@ -56,7 +59,7 @@ def register():
     permission = request.form.get("permission", type=int)
 
     if isinstance(password, str) and isinstance(username, str):
-        user = Users(username, password, permission)
+        user = Users.register(username, password, permission)
     else:
         return json_data("输入格式错误", 400)
     

@@ -1,6 +1,6 @@
-from dashboard.core.db import DB_BASE
+from dashboard.core.webapp import WEBAPP
+from dashboard.core.db import DB_BASE, DB_SESSION
 
-import json
 from hashlib import sha1
 from sqlalchemy import Column, Integer, String
 
@@ -31,3 +31,10 @@ class Users(DB_BASE.Model):
             'password': self.password,
             'permission': self.permission
         }
+    
+    @staticmethod
+    def register(username: str, password: str, permission: int = 1) -> 'Users':
+        if Users.query.filter(Users.username == username).first() != None:
+            return None
+        
+        return Users(username, password, permission)
