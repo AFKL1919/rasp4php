@@ -10,7 +10,7 @@ from future.utils import with_metaclass
 from rasp.utils.log import logger
 
 from rasp.core.rule import RULE_MANAGER, AbstractRule
-from rasp.common.config import PROJECT_ROOT, Path
+from rasp.common.config import DEFAULT_FILTER_DIR, Path
 
 
 class FilterResult(Enum):
@@ -63,7 +63,6 @@ class FilterManager(object):
 
     filters_context_dict = defaultdict(list)
     filters_name_dict = defaultdict(AbstractFilter)
-    DEFAULT_FILTER_DIR = PROJECT_ROOT / 'rasp/filters'
 
     def __init__(self, filter_path=None):
         self.load_filters(filter_path)
@@ -108,7 +107,7 @@ class FilterManager(object):
 
     def load_filters(self, path=None):
         modules = list()
-        filter_paths = [self.DEFAULT_FILTER_DIR, ]
+        filter_paths = [DEFAULT_FILTER_DIR, ]
 
         if path is not None:
             filter_paths.append(path)

@@ -15,6 +15,9 @@ RESOURCES_ROOT = PROJECT_ROOT / "resources"
 RASP_APP_RESOURCES = RESOURCES_ROOT / "rasp"
 DASHBOARD_RESOURCES = RESOURCES_ROOT / "dashboard"
 
+DEFAULT_RULE_DIR = RASP_APP_RESOURCES / "rules"
+DEFAULT_FILTER_DIR = RASP_APP_RESOURCES / "filters"
+
 config_file = PROJECT_ROOT / "resources" / "rasp" / "config.json"
 config_file_data = config_file.read_text()
 

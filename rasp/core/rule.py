@@ -6,7 +6,7 @@ from abc import abstractmethod
 
 from rasp.utils.log import logger
 from dashboard.core.db import DB_BASE
-from rasp.common.config import RASP_APP_RESOURCES, Path
+from rasp.common.config import DEFAULT_RULE_DIR, Path
 
 
 class RuleType(Enum):
@@ -46,7 +46,6 @@ class RuleManager(object):
     """Managing rules"""
 
     rules = dict()
-    DEFAULT_RULE_DIR = RASP_APP_RESOURCES / "rules"
 
     def __init__(self):
         logger.info("Rule Manager init.")
@@ -62,7 +61,7 @@ class RuleManager(object):
         return rule_obj_list
         
     def init_rule_manager(self, rule_method: AbstractRule, filter_class_name: str) -> list:
-        file = self.DEFAULT_RULE_DIR / Path(rule_method.filename)
+        file = DEFAULT_RULE_DIR / Path(rule_method.filename)
         if file.exists():
             rule_data_list = json.loads(file.read_text(encoding='utf-8'))
             rule_obj_list = self.import_rules_to_database(rule_data_list, rule_method)
