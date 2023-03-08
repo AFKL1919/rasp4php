@@ -73,8 +73,11 @@ class RuleManager(object):
         rule_list = rule_method.export_rules()
         self.rules[filter_class_name] = rule_list
             
-    def get_rule_list(self, filter_class_name: str) -> dict:
+    def get_rule_list(self, filter_class_name: str) -> list:
         return self.rules[filter_class_name]
+    
+    def get_all_rules(self) -> dict:
+        return self.rules
 
     def dump_rule_to_file(self, rule: AbstractRule):
         path = Path(rule.filename)
