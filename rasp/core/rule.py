@@ -74,6 +74,8 @@ class RuleManager(object):
         self.rules[filter_class_name] = rule_list
             
     def get_rule_list(self, filter_class_name: str) -> list:
+        if filter_class_name not in self.rules:
+            return list()
         return self.rules[filter_class_name]
     
     def get_all_rules(self) -> dict:
