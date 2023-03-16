@@ -65,9 +65,10 @@ class RuleManager(object):
         if file.exists():
             rule_data_list = json.loads(file.read_text(encoding='utf-8'))
             rule_obj_list = self.import_rules_to_database(rule_data_list, rule_method)
-            self.rules[filter_class_name] = rule_obj_list
         else:
-            raise FileNotFoundError("Rule file '{}' not found.".format(file))
+            rule_obj_list = list()
+        
+        self.rules[filter_class_name] = rule_obj_list
     
     def update_rule(self, rule_method: AbstractRule, filter_class_name: str):
         rule_list = rule_method.export_rules()
