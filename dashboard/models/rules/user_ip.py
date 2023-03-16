@@ -41,6 +41,6 @@ class UserIPRule(AbstractRule):
     def export_rules() -> list:
         with WEBAPP.app_context():
             q_list = DB_SESSION.query(UserIPRule).all()
-            return [q.serialize() for q in q_list]
+            return [q for q in q_list]
 
         
