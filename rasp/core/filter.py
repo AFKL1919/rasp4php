@@ -122,12 +122,15 @@ class FilterManager(object):
         module = self.load_module_from_file(Path(filename))
         self.load_filter_from_module(module)
 
-    def get_filters(self, context):
+    def get_filters_with_context(self, context):
         return self.filters_context_dict[FilterContext.ANY] + self.filters_context_dict[context]
+    
+    def get_filter_with_name(self, name: str):
+        return self.filters_name_dict[name]
     
     def filter(self, message):
         try:
-            filters = self.get_filters(FilterContext(message['context']))
+            filters = self.get_filters_with_context(FilterContext(message['context']))
             result = [filter.filter(message).value for filter in filters]
         except Exception as e:
             logger.error("Failed to filter message: {}, due to {}".format(message, e))
