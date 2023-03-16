@@ -2,7 +2,7 @@
     {
         "id": 1,
         "data": "api.wordpress.com",
-        "rule_type": 2,
+        "rule_type": 0,
         "data_type": "domain"
     },
     {
