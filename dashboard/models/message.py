@@ -52,3 +52,10 @@ class Message(DB_BASE.Model):
       self.query_string = payload["query_string"]
       self.document_root = payload["document_root"]
       self.hook_point = payload["hook_point"]
+    
+    def serialize(self) -> dict:
+      data = dict(vars(self))
+      data.pop('_sa_instance_state')
+      data['args'] = json.loads(data['args'])
+      data['normalized_args'] = json.loads(data['normalized_args'])
+      return data

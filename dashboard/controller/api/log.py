@@ -13,15 +13,7 @@ def get_install_log():
 @WEBAPP.route("/api/log/alarm", methods=["GET"])
 @login_required
 def get_alarm_log():
-    msg_dict_list = list()
     msg_obj_list = Message.query.all()
-    for msg_obj in msg_obj_list:
-        msg_obj_dict = dict(msg_obj.__dict__)
-        
-        msg_obj_dict.pop('_sa_instance_state')
-        msg_obj_dict['args'] = json_loads(msg_obj_dict['args'])
-        msg_obj_dict['normalized_args'] = json_loads(msg_obj_dict['normalized_args'])
-
-        msg_dict_list.append(msg_obj_dict)
-        
+    msg_dict_list = [msg_obj.serialize() for msg_obj in msg_obj_list]
+    
     return json_data(msg_dict_list)
