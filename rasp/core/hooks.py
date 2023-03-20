@@ -60,6 +60,10 @@ class HooksManager(object):
         'xml_load_external_entity': {'hook': 'xmlLoadExternalEntity', 'depends': set(['libxml', ])},
     }
 
+    START_REQUEST = {
+        'zend_execute_scripts':  {'hook': 'zend_execute_scripts', 'depends': set()}
+    }
+
     hooks = {
         'code_execution': CODE_EXECUTION,
         'command_execution': COMMAND_EXECUTION,
@@ -70,6 +74,7 @@ class HooksManager(object):
         'database_operation': DB_OPERATION,
         #'deserialization': DESERIALIZATION,
         'xml_external_entity': XXE,
+        'start_request': START_REQUEST
     }
 
     hook_script_base = PROJECT_ROOT / 'rasp/hooks'
