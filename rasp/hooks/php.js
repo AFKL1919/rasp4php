@@ -128,3 +128,28 @@ function block_request(status_code, body, headers) {
     )
   );
 }
+
+function block_request_for_blacklist_ip(status_code, body, headers) {
+  php_output_discard_all();
+
+  sapi_header_op(SAPI_HEADER_DELETE_ALL, ptr(0));
+
+  for (const [k, v] of Object.entries(headers)) {
+
+    var header = `${encodeURIComponent(k)}: ${encodeURIComponent(v)}`;
+    var header_ptr = Memory.allocUtf8String(header);
+    var sapi_header_line_ptr = Memory.alloc(Process.pointerSize + 8 + 4);
+
+    sapi_header_line_ptr.writePointer(header_ptr);
+    sapi_header_line_ptr.add(Process.pointerSize).writeS8(header.length);
+    sapi_header_line_ptr.add(Process.pointerSize + 8).writeInt(status_code);
+
+    sapi_header_op(SAPI_HEADER_REPLACE, sapi_header_line_ptr);
+  }
+
+  php_output_write(
+    Memory.allocUtf8String(body), ~-encodeURI(body).split(/%..|./).length
+  );
+  php_output_flush_all(ptr(0));
+  php_output_end_all(ptr(0));
+}
