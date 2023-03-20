@@ -16,9 +16,10 @@ from rasp.common.config import DEFAULT_FILTER_DIR, Path
 class FilterResult(Enum):
     """Filter result enumeration."""
 
-    IGNORE = False
-    ALERT = True
-    DEFAULT = True
+    PASS = 0
+    SAFE = 1
+    ALERT = 2
+    DEFAULT = 3
 
 
 class FilterContext(Enum):
@@ -32,6 +33,7 @@ class FilterContext(Enum):
     VAR = "var"
     XXE = "xxe"
     ANY = "any"
+    START_REQUEST = "start_request"
 
 
 class AbstractFilter(with_metaclass(ABCMeta)):
@@ -46,9 +48,14 @@ class AbstractFilter(with_metaclass(ABCMeta)):
         logger.info("Filter '{}' is loaded.".format(self.name))
     
     def update_filter_rule(self):
+        self.clear_filter_rule()
         rule_list = RULE_MANAGER.get_rule_list(self.name)
         self.init_filter_rule(rule_list)
     
+    @abstractmethod
+    def clear_filter_rule(self):
+        pass
+
     @abstractmethod
     def init_filter_rule(self, rule_list: List[AbstractRule]):
         pass
@@ -123,19 +130,39 @@ class FilterManager(object):
         self.load_filter_from_module(module)
 
     def get_filters_with_context(self, context):
+
+        if context == FilterContext.START_REQUEST:
+            return self.filters_context_dict[FilterContext.START_REQUEST]
+
+        if context == FilterContext.ANY:
+            return self.filters_context_dict[FilterContext.ANY]
+        
         return self.filters_context_dict[FilterContext.ANY] + self.filters_context_dict[context]
     
     def get_filter_with_name(self, name: str):
         return self.filters_name_dict[name]
     
     def filter(self, message):
+
+        result_list = list()
+        filters = self.get_filters_with_context(FilterContext(message['context']))
+        logger.error("{}".format(filters))
+
         try:
-            filters = self.get_filters_with_context(FilterContext(message['context']))
-            result = [filter.filter(message).value for filter in filters]
+            for filter in filters:
+                result = filter.filter(message)
+                logger.error("filter: {}, {}, result == FilterResult.SAFE: {}".format(filter, result, result == FilterResult.SAFE))
+                if result == FilterResult.PASS:
+                    return False
+                elif result == FilterResult.SAFE:
+                    result_list.append(False)
+                else:
+                    result_list.append(True)
+            
         except Exception as e:
             logger.error("Failed to filter message: {}, due to {}".format(message, e))
-            return FilterResult.DEFAULT.value
-
-        return all(result)
+            return True
+        
+        return all(result_list)
 
 FILTER_MANAGER = FilterManager()

@@ -21,12 +21,16 @@ class DefaultFileFilter(AbstractFilter):
         RULE_MANAGER.init_rule_manager(self.rule_method, self.name)
         rule_list = RULE_MANAGER.get_rule_list(self.name)
 
+        self.clear_filter_rule()
+        self.init_filter_rule(rule_list)
+    
+    def clear_filter_rule(self):
         self.rule[RuleType.BLACKLIST] = list()
         self.rule[RuleType.WHITELIST] = list()
-        self.init_filter_rule(rule_list)
 
     def init_filter_rule(self, rule_list: List[FileRule]):
         for rule in rule_list:
+            rule_type = RuleType(rule.rule_type)
             if rule.rule_type == RuleType.BLACKLIST:
                 self.rule[RuleType.BLACKLIST].append(rule)
             elif rule.rule_type == RuleType.WHITELIST:
@@ -52,13 +56,13 @@ class DefaultFileFilter(AbstractFilter):
                 return FilterResult.ALERT
 
             if not self.has_file_scheme(file_accessed):
-                return FilterResult.IGNORE
+                return FilterResult.SAFE
 
             for normalized_filename in message['normalized_args']:
                 if self.is_blacklisted(normalized_filename):
                     return FilterResult.ALERT
 
                 if self.is_whitelisted(normalized_filename):
-                    return FilterResult.IGNORE
+                    return FilterResult.SAFE
 
         return FilterResult.DEFAULT

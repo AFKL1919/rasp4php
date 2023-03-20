@@ -25,27 +25,32 @@ class DefaultScriptFilter(AbstractFilter):
         RULE_MANAGER.init_rule_manager(self.rule_method, self.name)
         rule_list = RULE_MANAGER.get_rule_list(self.name)
 
+        self.clear_filter_rule()
+        self.init_filter_rule(rule_list)
+    
+    def clear_filter_rule(self):
         self.rule[RuleType.BLACKLIST] = list()
         self.rule[RuleType.WHITELIST] = list()
-        self.init_filter_rule(rule_list)
 
     def init_filter_rule(self, rule_list: List[ScriptRule]):
         for rule in rule_list:
-            if rule.rule_type == RuleType.BLACKLIST:
+            rule_type = RuleType(rule.rule_type)
+            if rule_type == RuleType.BLACKLIST:
                 self.rule[RuleType.BLACKLIST].append(rule)
-            elif rule.rule_type == RuleType.WHITELIST:
+            elif rule_type == RuleType.WHITELIST:
                 self.rule[RuleType.WHITELIST].append(rule)
 
-    def _is_whitelisted(self, whitelisted_file: Path, filename: str) -> bool:
-        return whitelisted_file == filename or whitelisted_file.is_dir() and whitelisted_file in Path(filename).parents
+    def _is_whitelisted(self, whitelisted_file: Path, file_path: Path) -> bool:
+        return whitelisted_file == file_path or whitelisted_file.is_dir() and whitelisted_file in Path(file_path).parents
 
     def is_whitelisted(self, filename):
+        file_path = Path(filename)
         if not self.rule[RuleType.WHITELIST]:
             return False
 
         whitelist = [Path(script_ruler.data)
                      for script_ruler in self.rule[RuleType.WHITELIST]]
-        return any(self._is_whitelisted(whitelisted_file, filename) for whitelisted_file in whitelist)
+        return any(self._is_whitelisted(whitelisted_file, file_path) for whitelisted_file in whitelist)
 
     def filter(self, message):
         if 'filename' not in message or 'lineno' not in message:
@@ -55,6 +60,6 @@ class DefaultScriptFilter(AbstractFilter):
             (message['filename'], str(message['lineno'])))
 
         if self.is_whitelisted(suspicious_file):
-            return FilterResult.IGNORE
+            return FilterResult.SAFE
 
         return FilterResult.DEFAULT

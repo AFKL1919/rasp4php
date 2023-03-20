@@ -30,11 +30,14 @@ class DefaultNetworkFilter(AbstractFilter):
         RULE_MANAGER.init_rule_manager(self.rule_method, self.name)
         rule_list = RULE_MANAGER.get_rule_list(self.name)
 
+        self.clear_filter_rule()
+        self.init_filter_rule(rule_list)
+
+    def clear_filter_rule(self):
         self.rule[self.rule_entries.WHITELIST_DOMAIN] = list()
         self.rule[self.rule_entries.WHITELIST_IP] = list()
         self.rule[self.rule_entries.BLACKLIST_DOMAIN] = list()
         self.rule[self.rule_entries.BLACKLIST_IP] = list()
-        self.init_filter_rule(rule_list)
 
     def init_filter_rule(self, rule_list: List[NetworkRule]):
         for rule in rule_list:
@@ -42,12 +45,13 @@ class DefaultNetworkFilter(AbstractFilter):
             self._init_filter_rule(rule_m)
 
     def _init_filter_rule(self, rule: NetworkRule):
-        if rule.rule_type == RuleType.BLACKLIST:
+        rule_type = RuleType(rule.rule_type)
+        if rule_type == RuleType.BLACKLIST:
             if rule.is_domain():
                 self.rule[self.rule_entries.BLACKLIST_DOMAIN].append(rule)
             else:
                 self.rule[self.rule_entries.BLACKLIST_IP].append(rule)
-        elif rule.rule_type == RuleType.WHITELIST:
+        elif rule_type == RuleType.WHITELIST:
             if rule.is_domain():
                 self.rule[self.rule_entries.WHITELIST_DOMAIN].append(rule)
             else:
@@ -123,7 +127,7 @@ class DefaultNetworkFilter(AbstractFilter):
             u = urlparse(url)
 
             if self.is_unix_domain(u):
-                return FilterResult.IGNORE
+                return FilterResult.SAFE
 
             if self.has_suspicious_scheme(u):
                 return FilterResult.ALERT
@@ -133,13 +137,13 @@ class DefaultNetworkFilter(AbstractFilter):
 
             if ip is not None:
                 if self.is_whitelisted_ip(ip):
-                    return FilterResult.IGNORE
+                    return FilterResult.SAFE
                 if self.is_blacklisted_ip(ip):
                     return FilterResult.ALERT
             else:
                 # domain
                 if self.is_whitelisted_domain(host):
-                    return FilterResult.IGNORE
+                    return FilterResult.SAFE
                 if self.is_blacklisted_domain(host):
                     return FilterResult.ALERT
 
