@@ -1,6 +1,9 @@
 from dashboard.core.webapp import WEBAPP
+from dashboard.core.db import DB_SESSION
 from dashboard.utils.web import json_data, admin_required, login_required
 from rasp.core.rule import RULE_MANAGER
+from rasp.core.filter import FILTER_MANAGER
+from rasp.utils.log import logger
 
 from flask import request
 
@@ -8,8 +11,17 @@ from flask import request
 @WEBAPP.route("/api/rules", methods=["GET"])
 @login_required
 def get_rules():
-    classname_and_rule_list_dict = RULE_MANAGER.get_all_rules()
-    return json_data(classname_and_rule_list_dict.keys())
+
+    classname_and_rule_data_list_dict = dict()
+    classname_and_rule_obj_list_dict = RULE_MANAGER.get_all_rules()
+
+    for classname in classname_and_rule_obj_list_dict.keys():
+
+        rule_obj_list = classname_and_rule_obj_list_dict[classname]
+        rule_data_list = [rule.serialize() for rule in rule_obj_list]
+        classname_and_rule_data_list_dict[classname] = rule_data_list
+
+    return json_data(classname_and_rule_data_list_dict)
 
 
 @WEBAPP.route("/api/rule", methods=["POST"])
@@ -38,3 +50,39 @@ def get_rule_with_param():
     return json_data({
         classname: rule_list
     })
+
+@WEBAPP.route("/api/rule/update", methods=["POST"])
+@admin_required
+def update_rule():
+    classname = request.form.get("classname")
+    rule_id = request.form.get("rule_id", type=int)
+
+    if classname == "":
+        return json_data("缺少参数", 400)
+    
+    filter_instance = FILTER_MANAGER.get_filter_with_name(classname)
+    rule_method = filter_instance.rule_method
+    
+    try:
+        rule = DB_SESSION.query(rule_method).get(rule_id)
+        col_list = rule_method.__table__.columns.keys()
+
+        for col in col_list:
+            col_data = request.form.get(col, default=None)
+            
+            if col == "id" or col_data == None:
+                continue
+
+            setattr(rule, col, col_data)
+        
+        DB_SESSION.commit()
+
+        RULE_MANAGER.update_rule(rule_method, classname)
+        filter_instance.update_filter_rule()
+        
+    except Exception as e:
+        return json_data(str(e), 500)
+    
+    logger.info(f"filter rules changed Filter:{classname} rules:{[rule.serialize() for rule in RULE_MANAGER.get_rule_list(classname)]}")
+    return json_data("修改成功")
+
