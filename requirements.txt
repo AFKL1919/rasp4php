@@ -5,3 +5,4 @@ future==0.18.2
 pathlib2==2.3.7.post1
 setuptools==45.2.0
 SQLAlchemy==1.4.46
+pg8000

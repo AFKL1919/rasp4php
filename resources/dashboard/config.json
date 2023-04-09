@@ -4,6 +4,6 @@
         "PERMANENT_SESSION_LIFETIME": 5
     },
     "DB":{
-        "SQLALCHEMY_DATABASE_URI": "sqlite:////tmp/test.db"
+        "SQLALCHEMY_DATABASE_URI": "postgresql+pg8000://postgres:123456@172.18.0.101:5432/RASPDB"
     }
 }
