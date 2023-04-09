@@ -31,9 +31,9 @@ class DefaultFileFilter(AbstractFilter):
     def init_filter_rule(self, rule_list: List[FileRule]):
         for rule in rule_list:
             rule_type = RuleType(rule.rule_type)
-            if rule.rule_type == RuleType.BLACKLIST:
+            if rule_type == RuleType.BLACKLIST:
                 self.rule[RuleType.BLACKLIST].append(rule)
-            elif rule.rule_type == RuleType.WHITELIST:
+            elif rule_type == RuleType.WHITELIST:
                 self.rule[RuleType.WHITELIST].append(rule)
 
     def is_whitelisted(self, filename: str) -> bool:
