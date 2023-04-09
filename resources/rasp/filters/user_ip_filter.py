@@ -37,11 +37,9 @@ class DefaultUserIPFilter(AbstractFilter):
                 self.rule[RuleType.WHITELIST].append(rule)
 
     def is_whitelisted(self, remote_addr: str) -> bool:
-        logger.info(f"{[f.data == remote_addr for f in self.rule[RuleType.WHITELIST]]}")
         return any(f.data == remote_addr for f in self.rule[RuleType.WHITELIST])
 
     def is_blacklisted(self, remote_addr) -> bool:
-        logger.info(f"{[f.data == remote_addr for f in self.rule[RuleType.BLACKLIST]]}")
         return any(f.data == remote_addr for f in self.rule[RuleType.BLACKLIST])
 
     def filter(self, message):

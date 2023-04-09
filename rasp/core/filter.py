@@ -146,12 +146,10 @@ class FilterManager(object):
 
         result_list = list()
         filters = self.get_filters_with_context(FilterContext(message['context']))
-        logger.error("{}".format(filters))
 
         try:
             for filter in filters:
                 result = filter.filter(message)
-                logger.error("filter: {}, {}, result == FilterResult.SAFE: {}".format(filter, result, result == FilterResult.SAFE))
                 if result == FilterResult.PASS:
                     return False
                 elif result == FilterResult.SAFE:
