@@ -82,9 +82,18 @@ class RuleManager(object):
     def get_all_rules(self) -> dict:
         return self.rules
 
-    def dump_rule_to_file(self, rule: AbstractRule):
-        path = Path(rule.filename)
-        path.write_text(json.dumps(rule.serialize()), encoding='utf-8')
+    def dump_rules_to_file(self, filter_class_name: str):
+        rules = self.rules[filter_class_name]
+
+        if not rules:
+            return
+
+        path = Path(rules[0].filename)
+        path.write_text(
+            json.dumps([rule.serialize() for rule in rules]), encoding='utf-8'
+        )
+
+        return path
 
 
 RULE_MANAGER = RuleManager()
