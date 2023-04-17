@@ -1,5 +1,4 @@
-from dashboard.core.webapp import WEBAPP
-from dashboard.core.db import DB_BASE, DB_SESSION
+from dashboard.core.db import DB_BASE
 
 from hashlib import sha1
 from sqlalchemy import Column, Integer, String
